@@ -15,10 +15,10 @@ from rich import get_console
 
 from data_diff.version import __version__
 
-TRACK_URL = "https://hosted.rudderlabs.com/v1/track"
+TRACK_URL = ""
 START_EVENT = "os_diff_run_start"
 END_EVENT = "os_diff_run_end"
-TOKEN = "2HgtM4Hcq9BmeiCqNYhz7O9tkjM"
+TOKEN = ""
 TIMEOUT = 8
 
 DEFAULT_PROFILE = os.path.expanduser("~/.datadiff.toml")
@@ -74,7 +74,7 @@ def bool_notify_about_extension() -> bool:
     return False
 
 
-g_tracking_enabled = True
+g_tracking_enabled = False
 g_anonymous_id = None
 
 entrypoint_name = "Python API"
@@ -84,6 +84,7 @@ def disable_tracking() -> None:
     global g_tracking_enabled
     g_tracking_enabled = False
 
+disable_tracking()
 
 def is_tracking_enabled() -> bool:
     return g_tracking_enabled
@@ -219,19 +220,4 @@ def send_event_json(event_json) -> None:
     if not g_tracking_enabled:
         raise RuntimeError("Won't send; tracking is disabled!")
 
-    # Convert sets to lists in event_json
-    event_json = convert_sets_to_lists(event_json)
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Basic MkhndE00SGNxOUJtZWlDcU5ZaHo3Tzl0a2pNOg==",
-    }
-    data = json.dumps(event_json).encode()
-    try:
-        req = urllib.request.Request(TRACK_URL, data=data, headers=headers)
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as f:
-            res = f.read()
-            if f.code != 200:
-                raise RuntimeError(res)
-    except Exception as e:
-        logging.debug(f"Failed to post to Rudderstack: {e}")
+    return
